@@ -1,0 +1,31 @@
+server:
+  port: 7000
+  
+spring:
+  application:
+    name: ADMIN-SERVICE
+  datasource:
+    url: jdbc:mysql://localhost:3306/admindb
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+  jpa:
+    hibernate.ddl-auto: update
+    properties:
+     hibernate:
+      dialect: org.hibernate.dialect.MySQL8Dialect
+    
+management:
+  endpoints:
+    web:
+      exposure: 
+        include: "*"
+        
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${random.uuid}
+    
