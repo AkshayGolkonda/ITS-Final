@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,26 +29,26 @@ public class TechPanelController {
 
 	//1
 	@GetMapping(value="/candidate", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public List<Candidate> viewInterviewCandidates(){
-		return techService.viewInterviewCandidates();
+	public List<Candidate> viewInterviewCandidates(@RequestHeader("Authorization") String authToken){
+		return techService.viewInterviewCandidates(authToken);
 	}
 	
 	//2
 	@PutMapping(value="/interview/{id}", consumes={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public InterviewSchedule giveTechRating(@PathVariable("id") int id, @RequestBody InterviewSchedule interviewSchedule) {
-		return techService.giveTechRating(id, interviewSchedule);
+	public InterviewSchedule giveTechRating(@PathVariable("id") int id, @RequestBody InterviewSchedule interviewSchedule,@RequestHeader("Authorization") String authToken) {
+		return techService.giveTechRating(id, interviewSchedule,authToken);
 	}
 	
 	//3
 	@GetMapping(value="/candidate/{id}",produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public Candidate getCandidateById(@PathVariable("id")int id) {
-		return techService.getCandidateById(id);
+	public Candidate getCandidateById(@PathVariable("id")int id,@RequestHeader("Authorization") String authToken) {
+		return techService.getCandidateById(id,authToken);
 	}
 	
 	//4
 	@DeleteMapping(value="/tech/{id}")
-	public boolean resignTechPanelMember(@PathVariable("id")int id) {
-		return techService.resignTechPanelMember(id);
+	public boolean resignTechPanelMember(@PathVariable("id")int id,@RequestHeader("Authorization") String authToken) {
+		return techService.resignTechPanelMember(id,authToken);
 	}
 	
 	//additional endpoint 1

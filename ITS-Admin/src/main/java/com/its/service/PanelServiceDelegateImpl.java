@@ -23,7 +23,7 @@ public class PanelServiceDelegateImpl implements PanelServiceDelegate{
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		HttpEntity<Candidate> entity = new HttpEntity<>(candidate,headers);
-		
+
 		ResponseEntity<Candidate> response=this.restTemplate.postForEntity("http://API-GATEWAY/its-tech/candidate/entry", entity, Candidate.class, candidate);
 		return response.getBody();
 	}

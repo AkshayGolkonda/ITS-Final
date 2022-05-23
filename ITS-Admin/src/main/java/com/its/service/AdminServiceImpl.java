@@ -45,98 +45,128 @@ public class AdminServiceImpl implements AdminService{
 	
 	@Autowired
 	PanelServiceDelegate panelServiceDelegate;
+	
+	@Autowired
+	UserServiceDelegate userServiceDelegate;
 
 	//1
 	@Override
-	public Candidate addCandidate(Candidate candidate) {
-		CandidateEntity candidateEntity=convertCandidateDtoIntoEntity(candidate);
-		candidateRepo.save(candidateEntity);
-		return convertCandidateEntityIntoDto(candidateEntity);
+	public Candidate addCandidate(Candidate candidate,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			CandidateEntity candidateEntity=convertCandidateDtoIntoEntity(candidate);
+			candidateRepo.save(candidateEntity);
+			return convertCandidateEntityIntoDto(candidateEntity);
+		}
+		return null;
 	}
 
 	//2.1
 	@Override
-	public Candidate viewCandidateById(int id) {
-		Optional<CandidateEntity> opCandidateEntity=candidateRepo.findById(id);
-		if(opCandidateEntity.isPresent()) {
-			return convertCandidateEntityIntoDto(opCandidateEntity.get());
+	public Candidate viewCandidateById(int id,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			Optional<CandidateEntity> opCandidateEntity=candidateRepo.findById(id);
+			if(opCandidateEntity.isPresent()) {
+				return convertCandidateEntityIntoDto(opCandidateEntity.get());
+			}
+			return null;
 		}
 		return null;
 	}
 	
 	//2.2
 	@Override
-	public List<Candidate> viewAllCandidates() {
-		List<CandidateEntity> candidateEntities=candidateRepo.findAll();
-		//if(candidateEntities.isEmpty()) { throw new Exception; }
-		List<Candidate> candidates=new ArrayList<Candidate>();
-		for(CandidateEntity candidateEntity:candidateEntities) {
-			candidates.add(convertCandidateEntityIntoDto(candidateEntity));
+	public List<Candidate> viewAllCandidates(String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			List<CandidateEntity> candidateEntities=candidateRepo.findAll();
+			//if(candidateEntities.isEmpty()) { throw new Exception; }
+			List<Candidate> candidates=new ArrayList<Candidate>();
+			for(CandidateEntity candidateEntity:candidateEntities) {
+				candidates.add(convertCandidateEntityIntoDto(candidateEntity));
+			}
+			return candidates;
 		}
-		return candidates;
+		return null;
 	}
 	
 	//3
 	@Override
-	public String shareData(int id) {
-		InterviewSchedule interviewSchedule=getInterviewScheduleById(id);
-		Candidate candidate=viewCandidateById(interviewSchedule.getCandidateId());
-		if(interviewSchedule!=null && candidate!=null) {
-			panelServiceDelegate.shareCandidateWithPanel(candidate);
-			panelServiceDelegate.shareScheduleWithPanel(interviewSchedule);
-			return "Data Shared successfully with Panel";
+	public String shareData(int id,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			InterviewSchedule interviewSchedule=getInterviewScheduleById(id,authToken);
+			Candidate candidate=viewCandidateById(interviewSchedule.getCandidateId(),authToken);
+			if(interviewSchedule!=null && candidate!=null) {
+				panelServiceDelegate.shareCandidateWithPanel(candidate);
+				panelServiceDelegate.shareScheduleWithPanel(interviewSchedule);
+				return "Data Shared successfully with Panel";
+			}
+			return "Data Share Failed";
 		}
-		return "Data Share Failed";
+		return null;
 	}
 
 	//4
 	@Override
-	public InterviewSchedule scheduleInterview(InterviewSchedule interviewSchedule) {
-		InterviewScheduleEntity interviewScheduleEntity=convertInterviewScheduleDtoIntoEntity(interviewSchedule);
-		interviewScheduleRepo.save(interviewScheduleEntity);
-		return convertInterviewScheduleEntityIntoDto(interviewScheduleEntity);
+	public InterviewSchedule scheduleInterview(InterviewSchedule interviewSchedule,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			InterviewScheduleEntity interviewScheduleEntity=convertInterviewScheduleDtoIntoEntity(interviewSchedule);
+			interviewScheduleRepo.save(interviewScheduleEntity);
+			return convertInterviewScheduleEntityIntoDto(interviewScheduleEntity);
+		}
+		return null;
 	}
 
 	//5
 	@Override
-	public InterviewSchedule updateSchedule(int id, InterviewSchedule interviewSchedule) {
-		Optional<InterviewScheduleEntity> opInterviewScheduleEntity=interviewScheduleRepo.findById(id);
-		if(opInterviewScheduleEntity.isPresent()) {
-			InterviewScheduleEntity interviewScheduleEntity=opInterviewScheduleEntity.get();
-			interviewScheduleEntity.setCandidateId(interviewSchedule.getCandidateId());
-			interviewScheduleEntity.setInterviewDate(interviewSchedule.getInterviewDate());
-			interviewScheduleRepo.save(interviewScheduleEntity);
-			return convertInterviewScheduleEntityIntoDto(interviewScheduleEntity);
+	public InterviewSchedule updateSchedule(int id, InterviewSchedule interviewSchedule,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			Optional<InterviewScheduleEntity> opInterviewScheduleEntity=interviewScheduleRepo.findById(id);
+			if(opInterviewScheduleEntity.isPresent()) {
+				InterviewScheduleEntity interviewScheduleEntity=opInterviewScheduleEntity.get();
+				interviewScheduleEntity.setCandidateId(interviewSchedule.getCandidateId());
+				interviewScheduleEntity.setInterviewDate(interviewSchedule.getInterviewDate());
+				interviewScheduleRepo.save(interviewScheduleEntity);
+				return convertInterviewScheduleEntityIntoDto(interviewScheduleEntity);
+			}
+			return null;
 		}
 		return null;
 	}
 	
 	//additional endpoint
 	@Override
-	public InterviewSchedule getInterviewScheduleById(int id) {
-		Optional<InterviewScheduleEntity> opInterviewScheduleEntity=interviewScheduleRepo.findById(id);
+	public InterviewSchedule getInterviewScheduleById(int id,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			Optional<InterviewScheduleEntity> opInterviewScheduleEntity=interviewScheduleRepo.findById(id);
 			if(opInterviewScheduleEntity.isPresent()) {
 				return convertInterviewScheduleEntityIntoDto(opInterviewScheduleEntity.get());
 			}
+			return null;
+		}
 		return null;
 	}
 
 	//6
 	@Override
-	public boolean deleteSchedule(int id) {
-		if(interviewScheduleRepo.existsById(id)) {
-			interviewScheduleRepo.deleteById(id);
-			return true;
+	public boolean deleteSchedule(int id,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			if(interviewScheduleRepo.existsById(id)) {
+				interviewScheduleRepo.deleteById(id);
+				return true;
+			}
+			return false;
 		}
 		return false;
 	}
 
 	//7
 	@Override
-	public PanelMember addPanelMember(PanelMember panelMember) {
-		PanelMemberEntity panelMemberEntity=convertPanelMemberDtoIntoEntity(panelMember);
-		memberRepo.save(panelMemberEntity);
-		return convertPanelMemberEntityIntoDto(panelMemberEntity);
+	public PanelMember addPanelMember(PanelMember panelMember,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			PanelMemberEntity panelMemberEntity=convertPanelMemberDtoIntoEntity(panelMember);
+			memberRepo.save(panelMemberEntity);
+			return convertPanelMemberEntityIntoDto(panelMemberEntity);
+		}
+		return null;
 	}
 
 	//8
@@ -199,14 +229,17 @@ public class AdminServiceImpl implements AdminService{
 
 	//10
 	@Override
-	public List<PanelMember> getAllPanelMembers() {
-		List<PanelMemberEntity> panelMemberEntities=memberRepo.findAll();
-		//if(panelMemberEntities.isEmpty()) { throw new Exception;}
-		List<PanelMember> panelMembers=new ArrayList<PanelMember>();
-		for(PanelMemberEntity panelMemberEntity:panelMemberEntities) {
-			panelMembers.add(convertPanelMemberEntityIntoDto(panelMemberEntity));
+	public List<PanelMember> getAllPanelMembers(String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			List<PanelMemberEntity> panelMemberEntities=memberRepo.findAll();
+			//if(panelMemberEntities.isEmpty()) { throw new Exception;}
+			List<PanelMember> panelMembers=new ArrayList<PanelMember>();
+			for(PanelMemberEntity panelMemberEntity:panelMemberEntities) {
+				panelMembers.add(convertPanelMemberEntityIntoDto(panelMemberEntity));
+			}
+			return panelMembers;
 		}
-		return panelMembers;
+		return null;
 	}
 	
 	private CandidateEntity convertCandidateDtoIntoEntity(Candidate candidate) {

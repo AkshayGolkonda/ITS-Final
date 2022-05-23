@@ -20,9 +20,12 @@ public class ItsHrPanelApplication {
 	public ModelMapper getModelMapper() {
 		return new ModelMapper();
 	}
+	
 	@Bean
 	@LoadBalanced
 	public RestTemplate getRestTemplate() {
 		return new  RestTemplate();
 	}
+	
+	
 }

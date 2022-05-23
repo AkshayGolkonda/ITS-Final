@@ -20,6 +20,10 @@ spring:
         uri: lb://HR-SERVICE
         predicates:
           - Path=/its-hr/**
+      - id: AUTH-SERVICE
+        uri: lb://AUTH-SERVICE
+        predicates:
+          - Path=/its-login/**
 
 eureka:
   client:

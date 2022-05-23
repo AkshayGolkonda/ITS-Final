@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,26 +29,26 @@ public class HRController {
 
 	//1
 	@GetMapping(value="/candidate", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public List<Candidate> viewInterviewCandidates(){
-		return hrService.viewInterviewCandidates();
+	public List<Candidate> viewInterviewCandidates(@RequestHeader("Authorization") String authToken){
+		return hrService.viewInterviewCandidates(authToken);
 	}
 	
 	//2
 	@PutMapping(value="/interview/{id}", consumes={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public InterviewSchedule giveHRRating(@PathVariable("id") int id, @RequestBody InterviewSchedule interviewSchedule) {
-		return hrService.giveHRRating(id, interviewSchedule);
+	public InterviewSchedule giveHRRating(@PathVariable("id") int id, @RequestBody InterviewSchedule interviewSchedule,@RequestHeader("Authorization") String authToken) {
+		return hrService.giveHRRating(id, interviewSchedule,authToken);
 	}
 	
 	//3
 	@GetMapping(value="/candidate/{id}",produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public Candidate getCandidateById(@PathVariable("id")int id) {
-		return hrService.getCandidateById(id);
+	public Candidate getCandidateById(@PathVariable("id")int id,@RequestHeader("Authorization") String authToken) {
+		return hrService.getCandidateById(id,authToken);
 	}
 	
 	//4
 	@DeleteMapping(value="/hr/{id}")
-	public boolean resignHRPanelMember(@PathVariable("id")int id) {
-		return hrService.resignHRPanelMember(id);
+	public boolean resignHRPanelMember(@PathVariable("id")int id,@RequestHeader("Authorization") String authToken) {
+		return hrService.resignHRPanelMember(id,authToken);
 	}
 	
 	//additional endpoints 1,2 are not required as same implemented in ITS-Tech

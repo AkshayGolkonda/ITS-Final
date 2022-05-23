@@ -66,4 +66,13 @@ public class InterviewSchedule {
 				+ interviewDate + "]";
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+	InterviewSchedule interviewSchedule = (InterviewSchedule) obj;
+	if (this.finalStatus.equals(interviewSchedule.getFinalStatus())) {
+	return true;
+	}
+	return false;
+	}
+	
 }

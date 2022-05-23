@@ -46,4 +46,14 @@ public class PanelMember {
 				+ "]";
 	}
 	
+	
+	@Override
+	public boolean equals(Object obj) {
+	PanelMember panelMember = (PanelMember) obj;
+	if (this.name.equals(panelMember.getName())) {
+	return true;
+	}
+	return false;
+	}
+	
 }

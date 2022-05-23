@@ -88,4 +88,13 @@ public class Candidate {
 				+ ", qualification=" + qualification + ", designation=" + designation + ", noticePeriod=" + noticePeriod
 				+ ", location=" + location + "]";
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	Candidate candidate = (Candidate) obj;
+	if (this.candidateName.equals(candidate.getCandidateName())) {
+	return true;
+	}
+	return false;
+	}
 }

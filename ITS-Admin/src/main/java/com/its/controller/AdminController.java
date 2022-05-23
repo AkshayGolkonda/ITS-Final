@@ -3,7 +3,9 @@ package com.its.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,56 +33,56 @@ public class AdminController {
 
 	//1
 	@PostMapping(value="/candidate", consumes={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public Candidate addCandidate(@RequestBody Candidate candidate) {
-		return adminService.addCandidate(candidate);
+	public ResponseEntity<Candidate> addCandidate(@RequestBody Candidate candidate,@RequestHeader("Authorization") String authToken) {
+		return new ResponseEntity<Candidate>(adminService.addCandidate(candidate,authToken),HttpStatus.OK);
 	}
 	
 	//2.1
 	@GetMapping(value="/candidate/{id}", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public Candidate viewCandidateById(@PathVariable("id") int id) {
-		return adminService.viewCandidateById(id);
+	public Candidate viewCandidateById(@PathVariable("id") int id,@RequestHeader("Authorization") String authToken) {
+		return adminService.viewCandidateById(id,authToken);
 	}
 	
 	//2.2
 	@GetMapping(value="/candidate", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public List<Candidate> viewAllCandidates(){
-		return adminService.viewAllCandidates();
+	public List<Candidate> viewAllCandidates(@RequestHeader("Authorization") String authToken){
+		return adminService.viewAllCandidates(authToken);
 	}
 	
 	//3
 	@PostMapping(value="/share/{id}", consumes={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public String shareDataWithTech(@PathVariable("id")int id) {
-		return adminService.shareData(id);
+	public String shareData(@PathVariable("id")int id,@RequestHeader("Authorization") String authToken) {
+		return adminService.shareData(id,authToken);
 	}
 	
 	//4
 	@PostMapping(value="/schedule", consumes={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public InterviewSchedule scheduleInterview(@RequestBody InterviewSchedule interviewSchedule) {
-		return adminService.scheduleInterview(interviewSchedule);
+	public InterviewSchedule scheduleInterview(@RequestBody InterviewSchedule interviewSchedule,@RequestHeader("Authorization") String authToken) {
+		return adminService.scheduleInterview(interviewSchedule,authToken);
 	}
 	
 	//5
 	@PutMapping(value="/schedule/{id}", consumes={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public InterviewSchedule updateSchedule(@PathVariable("id") int id, @RequestBody InterviewSchedule interviewSchedule) {
-		return adminService.updateSchedule(id, interviewSchedule);
+	public InterviewSchedule updateSchedule(@PathVariable("id") int id, @RequestBody InterviewSchedule interviewSchedule,@RequestHeader("Authorization") String authToken) {
+		return adminService.updateSchedule(id, interviewSchedule,authToken);
 	}
 	
-	//missing(additional endpoint)
+	//(additional endpoint)5.1
 	@GetMapping(value="/schedule/{id}", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public InterviewSchedule getInterviewScheduleById(@PathVariable("id")int id) {
-		return null;
+	public InterviewSchedule getInterviewScheduleById(@PathVariable("id")int id,@RequestHeader("Authorization") String authToken) {
+		return adminService.getInterviewScheduleById(id,authToken);
 	}
 	
 	//6
 	@DeleteMapping(value="/schedule/{id}")
-	public boolean deleteSchedule(@PathVariable("id") int id) {
-		return adminService.deleteSchedule(id);
+	public boolean deleteSchedule(@PathVariable("id") int id,@RequestHeader("Authorization") String authToken) {
+		return adminService.deleteSchedule(id,authToken);
 	}
 	
 	//7
 	@PostMapping(value="/panel", consumes={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public PanelMember addPanelMember(@RequestBody PanelMember panelMember) {
-		return adminService.addPanelMember(panelMember);
+	public PanelMember addPanelMember(@RequestBody PanelMember panelMember,@RequestHeader("Authorization") String authToken) {
+		return adminService.addPanelMember(panelMember,authToken);
 	}
 	
 	//8
@@ -89,7 +92,7 @@ public class AdminController {
 		return adminService.searchEmployee(id, name);
 	}
 	
-	//9
+	//9.1
 	@DeleteMapping(value="/panel/tech/{id}")
 	public boolean deleteTechMember(@PathVariable("id")int id) {
 		return adminService.deleteTechMember(id);
@@ -103,7 +106,7 @@ public class AdminController {
 	
 	//10
 	@GetMapping(value="/panel", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public List<PanelMember> getAllPanelMembers(){
-		return adminService.getAllPanelMembers();
+	public List<PanelMember> getAllPanelMembers(@RequestHeader("Authorization") String authToken){
+		return adminService.getAllPanelMembers(authToken);
 	}
 }

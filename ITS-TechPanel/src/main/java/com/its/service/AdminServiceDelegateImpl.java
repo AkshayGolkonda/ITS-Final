@@ -14,6 +14,7 @@ public class AdminServiceDelegateImpl implements AdminServiceDelegate{
 
 	@Autowired
 	RestTemplate restTemplate;
+	
 	@Override
 	public boolean isDeleteSuccessful(int id) {
 		//HttpHeaders headers = new HttpHeaders();

@@ -10,18 +10,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class AdminServiceDelegateImpl implements AdminServiceDelegate{
-
+public class UserServiceDelegateImpl implements UserServiceDelegate{
+	
 	@Autowired
 	RestTemplate restTemplate;
-	@Override
-	public boolean isDeleteSuccessful(int id) {
-		//HttpHeaders headers = new HttpHeaders();
-		//headers.setContentType(MediaType.APPLICATION_JSON);
 
-		HttpEntity<Integer> entity = new HttpEntity<>(id);
-		
-		ResponseEntity<Boolean> response=this.restTemplate.exchange("http://API-GATEWAY/its-admin/panel/hr/{id}", HttpMethod.DELETE, entity, Boolean.class,id);
+	@Override
+	public boolean isTokenValid(String authToken) {
+		HttpHeaders headers=new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("Authorization", authToken);
+		HttpEntity entity=new HttpEntity(headers);
+		ResponseEntity<Boolean> response=
+				this.restTemplate.exchange("http://API-GATEWAY/its-login/token/admin/validate", HttpMethod.GET, entity, Boolean.class);
 		return response.getBody();
 	}
 

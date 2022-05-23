@@ -40,46 +40,61 @@ public class HRServiceImpl implements HRService{
 	
 	@Autowired
 	AdminServiceDelegate adminServiceDelegate;
+	
+	@Autowired
+	UserServiceDelegate userServiceDelegate;
 
 	@Override
-	public List<Candidate> viewInterviewCandidates() {
-		List<InterviewScheduleEntity> interviewEntities=interviewScheduleRepo.findAll();
-		//if(candidateEntities.isEmpty()) { throw new Exception; }
-		List<Candidate> candidates=new ArrayList<Candidate>();
-		for(InterviewScheduleEntity interviewScheduleEntity:interviewEntities) {
-			candidates.add(getCandidateById(interviewScheduleEntity.getCandidateId()));
-		}
-		return candidates;
-	}
-
-	@Override
-	public InterviewSchedule giveHRRating(int id, InterviewSchedule interviewSchedule) {
-		Optional<InterviewScheduleEntity> opInterviewScheduleEntity=interviewScheduleRepo.findById(id);
-		if(opInterviewScheduleEntity.isPresent()) {
-			InterviewScheduleEntity interviewScheduleEntity=opInterviewScheduleEntity.get();
-			interviewScheduleEntity.setHrRating(interviewSchedule.getHrRating());
-			if(interviewScheduleEntity.getHrRating()>5 && interviewScheduleEntity.getTechRating()>5)
-				interviewScheduleEntity.setFinalStatus("PASSED");
-			if(interviewScheduleEntity.getHrRating()<5 || interviewScheduleEntity.getTechRating()<5)
-				interviewScheduleEntity.setFinalStatus("FAIL");
-			interviewScheduleRepo.save(interviewScheduleEntity);
-			return convertInterviewScheduleEntityIntoDto(interviewScheduleEntity);
+	public List<Candidate> viewInterviewCandidates(String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			List<InterviewScheduleEntity> interviewEntities=interviewScheduleRepo.findAll();
+			//if(candidateEntities.isEmpty()) { throw new Exception; }
+			List<Candidate> candidates=new ArrayList<Candidate>();
+			for(InterviewScheduleEntity interviewScheduleEntity:interviewEntities) {
+				candidates.add(getCandidateById(interviewScheduleEntity.getCandidateId(),authToken));
+			}
+			return candidates;
 		}
 		return null;
 	}
 
 	@Override
-	public Candidate getCandidateById(int id) {
-		Optional<CandidateEntity> opCandidateEntity=candidateRepo.findById(id);
-		if(opCandidateEntity.isPresent()) {
-			return convertCandidateEntityIntoDto(opCandidateEntity.get());
+	public InterviewSchedule giveHRRating(int id, InterviewSchedule interviewSchedule,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			Optional<InterviewScheduleEntity> opInterviewScheduleEntity=interviewScheduleRepo.findById(id);
+			if(opInterviewScheduleEntity.isPresent()) {
+				InterviewScheduleEntity interviewScheduleEntity=opInterviewScheduleEntity.get();
+				interviewScheduleEntity.setHrRating(interviewSchedule.getHrRating());
+				if(interviewScheduleEntity.getHrRating()>5 && interviewScheduleEntity.getTechRating()>5)
+					interviewScheduleEntity.setFinalStatus("PASSED");
+				if(interviewScheduleEntity.getHrRating()<5 || interviewScheduleEntity.getTechRating()<5)
+					interviewScheduleEntity.setFinalStatus("FAIL");
+				interviewScheduleRepo.save(interviewScheduleEntity);
+				return convertInterviewScheduleEntityIntoDto(interviewScheduleEntity);
+			}
+			return null;
 		}
 		return null;
 	}
 
 	@Override
-	public boolean resignHRPanelMember(int id) {
-		return adminServiceDelegate.isDeleteSuccessful(id);
+	public Candidate getCandidateById(int id,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			Optional<CandidateEntity> opCandidateEntity=candidateRepo.findById(id);
+			if(opCandidateEntity.isPresent()) {
+				return convertCandidateEntityIntoDto(opCandidateEntity.get());
+			}
+			return null;
+		}
+		return null;
+	}
+
+	@Override
+	public boolean resignHRPanelMember(int id,String authToken) {
+		if(userServiceDelegate.isTokenValid(authToken)) {
+			return adminServiceDelegate.isDeleteSuccessful(id);
+		}
+		return false;
 	}
 	
 	private CandidateEntity convertCandidateDtoIntoEntity(Candidate candidate) {
